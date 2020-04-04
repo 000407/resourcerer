@@ -9,6 +9,7 @@ class Router
 {
     public static function parse($url) {
         global $ROUTES;
+
         $request = new stdClass;
         $url = ltrim(rtrim($url, '/'), '/');
 
@@ -21,13 +22,13 @@ class Router
         }
 
         if(!$pattern) {
-            die('NOT FOUND');
+            die('NOT FOUND'); //TODO: Handle 404
         }
 
         $pathMetadata = $ROUTES[$pattern];
 
         if($_SERVER['REQUEST_METHOD'] !== $pathMetadata['method']) {
-            die("URL does not support the request method");
+            die("URL does not support the request method"); //TODO: Handle 405
         }
 
         $segments = explode('/', $url);

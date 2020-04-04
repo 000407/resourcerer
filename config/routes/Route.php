@@ -1,26 +1,41 @@
 <?php
 
 class Route {
-    public static function get($path, $actionRef) {
-        $path = APPROOT . "/$path";
-        global $ROUTES;
+    private $prefix = NULL;
 
-        list($pathRegex, $params) = self::resolvePath($path);
+    public static function group(array $settings, Closure $callback) {
+        extract($settings);
+        $route = new Route;
 
-        list($controller, $action) = self::resolveControllerAction($actionRef);
+        if(isset($prefix)) {
+            $prefix = trim($prefix);
+            $prefix = ltrim(rtrim($prefix, '/'), '/');
+            $route->prefix = $prefix;
+        }
 
-        $ROUTES[$pathRegex] = [
-            'path' => $path,
-            'method' => 'GET',
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $params
-        ];
+        $callback->call($route);
     }
 
-    public static function post($path, $actionRef) {
-        $path = APPROOT . "/$path";
+    public static function get($path, $actionRef, Route $route = NULL) {
+        $route = $route ?? new Route;
+        $route->generateRoute($path, $actionRef, 'GET');
+    }
+
+    public static function post($path, $actionRef, Route $route = NULL) {
+        $route = $route ?? new Route;
+        $route->generateRoute($path, $actionRef, 'POST');
+    }
+
+    private function generateRoute($path, $actionRef, $method) {
         global $ROUTES;
+
+        if(isset($this->prefix)) {
+            $prefix = $this->prefix;
+            $path = APPROOT . "/$prefix/$path";
+        }
+        else {
+            $path = APPROOT . "/$path";
+        }
 
         list($pathRegex, $params) = self::resolvePath($path);
 
@@ -28,7 +43,7 @@ class Route {
 
         $ROUTES[$pathRegex] = [
             'path' => $path,
-            'method' => 'POST',
+            'method' => $method,
             'controller' => $controller,
             'action' => $action,
             'params' => $params

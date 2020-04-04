@@ -8,7 +8,7 @@
 
 class BaseController
 {
-    protected function loadView($vars = null, $plain = false){
+    protected function loadView($vars = null){
         $backtrace = debug_backtrace();
         $lastCaller = end($backtrace);
         $controller = strtolower(str_replace("Controller", "", $lastCaller["class"]));
@@ -18,16 +18,8 @@ class BaseController
             extract($vars);
         }
 
-        $header = "header";
-        $footer = "footer";
-
-        if($plain === true){
-            $header = "header-plain";
-            $footer = "footer-plain";
-        }
-
-        require_once(ROOT . "view/template/$header.php");
+        require_once(ROOT . "view/template/header.php");
         require_once (ROOT . "view/$controller/$action.php");
-        require_once(ROOT . "view/template/$footer.php");
+        require_once(ROOT . "view/template/footer.php");
     }
 }

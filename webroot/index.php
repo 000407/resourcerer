@@ -27,4 +27,8 @@ $params = $request->params;
 
 $controller = new $controllerName();
 
-call_user_func_array(array($controller, $methodName), $params);
+try {
+    call_user_func_array(array($controller, $methodName), $params);
+} catch (Exception $e) {
+    //TODO: Handle errors
+}
